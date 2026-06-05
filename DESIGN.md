@@ -58,3 +58,10 @@ The agent is built with granular logging and observability to ensure transparenc
 - **Execution Tracking:** Every request is logged via standard stdout/stderr, allowing operators to monitor the exact ingestion sequence and tool invocation flows.
 - **Data Access Transparency:** Logs explicitly capture which database tables are being targeted, providing a clear audit trail of data access patterns.
 - **Failure Analysis:** Using robust error boundaries, the system provides immediate diagnostic feedback for failed requests. As demonstrated in `handled_failure.png`, operators can identify the root cause (e.g., schema constraint mismatch or runtime connectivity errors) by inspecting terminal logs.
+
+
+#### Deployment Trade-offs & Known Limitations:
+
+Cold-Start Latency: The application utilizes a managed PostgreSQL instance. During initial spins or cold starts, the connection handshake may delay the readiness of the POST /ask endpoint.
+* Reliability Strategy: The system is designed with robust error-handling and try-catch blocks around all database-touching tools. This ensures that even if the database is temporarily unreachable during a cold start, the agent will return a diagnostic "System Busy" or "Connection Timeout" response rather than a silent failure.
+* Observability: Because the system logs the request_id, latency, and status for every request, any initialization failures or connection timeouts can be inspected via the Render logs.

@@ -5,62 +5,25 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Debugging ke liye check kar rahe hain ki URL load hua ya nahi
+console.log("Checking DB URL:", process.env.DATABASE_URL);
+
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/finance_agent',
+  connectionString: process.env.DATABASE_URL,
 });
 
 async function runIngest() {
-  
   const targetFolder = process.env.DATA_DIR || path.join(process.cwd(), 'data', 'sample_a');
-  console.log(`🚀 Starting execution sequence for target directory: ${targetFolder}`);
+  console.log(`🚀 Starting execution: ${targetFolder}`);
 
   const client = await pool.connect();
-
   try {
     await client.query('BEGIN');
 
-    
-    await client.query(`
-      CREATE TABLE IF NOT EXISTS transactions (
-        id VARCHAR(50) PRIMARY KEY,
-        date DATE NOT NULL,
-        merchant VARCHAR(255) NOT NULL,
-        category VARCHAR(100) NOT NULL,
-        amount NUMERIC(15,2) NOT NULL,
-        currency VARCHAR(10) NOT NULL,
-        memo TEXT
-      );
-
-      CREATE TABLE IF NOT EXISTS funds (
-        id VARCHAR(50) PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        category VARCHAR(100) NOT NULL
-      );
-
-      CREATE TABLE IF NOT EXISTS fund_nav (
-        id SERIAL PRIMARY KEY,
-        fund_id VARCHAR(50) REFERENCES funds(id) ON DELETE CASCADE,
-        date DATE NOT NULL,
-        nav NUMERIC(15,4) NOT NULL
-      );
-
-      CREATE TABLE IF NOT EXISTS holdings (
-        fund_id VARCHAR(50) PRIMARY KEY,
-        fund_name VARCHAR(255) NOT NULL,
-        units NUMERIC(15,4) NOT NULL,
-        purchase_date DATE NOT NULL,
-        purchase_nav NUMERIC(15,4) NOT NULL
-      );
-    `);
-
-    
+    // 1. Tables clear karo taaki purana data clash na kare
     await client.query('TRUNCATE transactions, fund_nav, holdings, funds CASCADE');
 
-    if (!fs.existsSync(targetFolder)) {
-      throw new Error(`Target path snapshot directory target is invalid: ${targetFolder}`);
-    }
-
-    
+    // 2. Data load karo
     const txPath = path.join(targetFolder, 'transactions.json');
     if (fs.existsSync(txPath)) {
       const rawTx = JSON.parse(fs.readFileSync(txPath, 'utf8'));
@@ -73,7 +36,6 @@ async function runIngest() {
       }
     }
 
-    
     const fundsPath = path.join(targetFolder, 'funds.json');
     if (fs.existsSync(fundsPath)) {
       const rawFunds = JSON.parse(fs.readFileSync(fundsPath, 'utf8'));
@@ -82,40 +44,22 @@ async function runIngest() {
           `INSERT INTO funds (id, name, category) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING`,
           [f.id, f.name, f.category]
         );
-
-        if (f.nav_history && typeof f.nav_history === 'object') {
+        if (f.nav_history) {
           for (const [dateStr, navVal] of Object.entries(f.nav_history)) {
-            await client.query(
-              `INSERT INTO fund_nav (fund_id, date, nav) VALUES ($1, $2, $3)`,
-              [f.id, dateStr, navVal]
-            );
+            await client.query(`INSERT INTO fund_nav (fund_id, date, nav) VALUES ($1, $2, $3)`, [f.id, dateStr, navVal]);
           }
         }
       }
     }
 
-    
-    const holdingsPath = path.join(targetFolder, 'holdings.json');
-    if (fs.existsSync(holdingsPath)) {
-      const rawHoldings = JSON.parse(fs.readFileSync(holdingsPath, 'utf8'));
-      for (const h of rawHoldings) {
-        await client.query(
-          `INSERT INTO holdings (fund_id, fund_name, units, purchase_date, purchase_nav) 
-           VALUES ($1, $2, $3, $4, $5) ON CONFLICT (fund_id) DO NOTHING`,
-          [h.fund_id, h.fund_name, h.units, h.purchase_date, h.purchase_nav]
-        );
-      }
-    }
-
     await client.query('COMMIT');
-    console.log(`🎉 Ingestion sequence parsing completed cleanly for data array target context!`);
+    console.log(`🎉 Ingestion successful!`);
   } catch (err) {
     await client.query('ROLLBACK');
-    console.error('❌ Database parsing step failed sequence aborting:', err);
+    console.error('❌ Error:', err);
   } finally {
     client.release();
     await pool.end();
   }
 }
-
 runIngest();
