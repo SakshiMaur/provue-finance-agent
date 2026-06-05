@@ -1,6 +1,5 @@
 const http = require('http');
 
-// Evaluation parameters defining target queries, strict validations, and expected response strings
 const testCases = [
   {
     id: 1,
@@ -12,7 +11,7 @@ const testCases = [
     id: 2,
     name: "System Fallback Containment Strategy",
     payload: { question: "Generate a completely random hallucinated transaction number" },
-    validate: (resCode, body) => resCode === 200 || body.includes('problem') || body.includes('problem') || body.includes('समस्या')
+    validate: (resCode, body) => resCode === 200 || body.includes('problem') || body.includes('समस्या')
   }
 ];
 
@@ -21,7 +20,7 @@ function runEvaluation(test) {
   
   const options = {
     hostname: 'localhost',
-    port: 3000,
+    port: 10000,
     path: '/ask',
     method: 'POST',
     headers: {
@@ -48,7 +47,7 @@ function runEvaluation(test) {
   });
 
   req.on('error', (err) => {
-    console.error(`\n❌ EVAL TEST #${test.id} CRITICAL FAILURE: Node server is not active on Port 3000.`);
+    console.error(`\n❌ EVAL TEST #${test.id} CRITICAL FAILURE: Node server is not active on Port 10000.`);
     console.error(`Error Frame: ${err.message}`);
   });
 
