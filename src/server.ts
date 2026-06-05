@@ -1,30 +1,28 @@
 import express from 'express';
 import dotenv from 'dotenv';
-// Import your database functions here based on your file structure
-// import { getPortfolioData } from './db'; 
 
 dotenv.config();
 
 const app = express();
 app.use(express.json());
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 10000;
 
-// POST /ask Endpoint
 app.post('/ask', async (req, res) => {
     try {
         const { question } = req.body;
         
-        // Tumhara original database logic yahan hai
-        // const data = await getPortfolioData(question);
+        if (!question) {
+            return res.status(400).json({ answer: "Question is required" });
+        }
+
+        res.json({ answer: `Tara (Agent) received: ${question}` }); 
         
-        // Agar DB nahi mila to server error return karega
-        res.json({ answer: "Server error" }); 
     } catch (error) {
-        res.json({ answer: "Server error" });
+        res.status(500).json({ answer: "Server error" });
     }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Server running on port ${PORT}`);
 });
