@@ -42,6 +42,9 @@ Trigger Evaluation:
 
 Bash
 curl -X POST http://localhost:3000/ask -H "Content-Type: application/json" -d "{\"question\":\"Mera portfolio worth kya hai?\"}"
+
+
+
 2. Deployment (Live)
 The API is live and hosted at: https://provue-finance-agent.onrender.com
 Note:
