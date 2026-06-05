@@ -1,5 +1,12 @@
 # Provue Finance-Research Agent
 
+GitHub Repository: https://github.com/SakshiMaur/provue-finance-agent
+Live Deployment:https://provue-finance-agent.onrender.com
+Note:
+The root URL / does not have a UI; use the POST /ask endpoint to interact with the agent.
+
+
+
 ## Architecture Overview
 This financial research agent is architected using **Node.js, Express, and TypeScript**, integrated directly with the **Google Gen AI SDK (Gemini)** for low-latency contextual processing over analytical databases.
 
@@ -37,13 +44,10 @@ Bash
 curl -X POST http://localhost:3000/ask -H "Content-Type: application/json" -d "{\"question\":\"Mera portfolio worth kya hai?\"}"
 2. Deployment (Live)
 The API is live and hosted at: https://provue-finance-agent.onrender.com
-
 Note:
-
 The root URL / does not have a UI; use the POST /ask endpoint to interact with the agent.
 
-Required Environment Variables (in Render):
-
+#### Required Environment Variables (in Render):
 DATABASE_URL=YOUR_URL_HERE
 GOOGLE_GENERATIVE_AI_API_KEY=YOUR_API_KEY_HERE
 PORT=10000
