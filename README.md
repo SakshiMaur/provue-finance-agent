@@ -44,11 +44,13 @@ The root URL / does not have a UI; use the POST /ask endpoint to interact with t
 
 Required Environment Variables (in Render):
 
-DATABASE_URL: postgresql://neondb_owner:npg_xnGNMoij73CE@ep-soft-wildflower-aqohe1y1.c-8.us-east-1.aws.neon.tech/neondb?sslmode=require
+DATABASE_URL=YOUR_URL_HERE
+GOOGLE_GENERATIVE_AI_API_KEY=YOUR_API_KEY_HERE
+PORT=10000
 
-GOOGLE_GENERATIVE_AI_API_KEY: AQ.Ab8RN6JDsP1L5GKCj0Htebwu4-iSpykD8dnY-5yy7JDxUF13eQ
+NOTE:-
+"Please configure the above variables in your environment to run the agent."
 
-PORT: 10000
 
 Verification
 API Status: The endpoint is verified and active.

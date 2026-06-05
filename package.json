@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "start": "tsx src/server.ts",
-    "build": "npx tsx src/ingest.ts && tsx src/server.ts"
+    "ingest": "tsx scripts/ingest.ts"
   },
   "dependencies": {
     "@google/genai": "^2.8.0",
