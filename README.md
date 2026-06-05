@@ -63,3 +63,7 @@ Verification
 API Status: The endpoint is verified and active.
 
 Error Handling: The system is equipped with robust try-catch routing to return diagnostic responses (e.g., "Server error") during database connection timeouts or schema mismatches, ensuring the API does not crash.
+
+
+Deployment Status:
+The service is currently hosted on Render and completes its initialization sequence successfully. Please note that due to external database connection propagation, there may be instances of "cold-start" latency where the application remains in an initialization state. If the /ask endpoint appears unresponsive, please allow a few moments for the database handshake to complete.

@@ -20,7 +20,7 @@ function runEvaluation(test) {
   
   const options = {
     hostname: 'localhost',
-    port: 10000,
+    port: 3000,
     path: '/ask',
     method: 'POST',
     headers: {
